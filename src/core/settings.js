@@ -2,7 +2,7 @@ export const SETTINGS = [
   {
     key: 'theme',
     label: '主题',
-    options: ['paper', 'night']
+    options: ['paper', 'night', 'opencode']
   },
   {
     key: 'charsPerLine',

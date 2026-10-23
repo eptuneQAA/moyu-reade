@@ -18,6 +18,16 @@ export const THEMES = {
     accent: '#c9a86a',
     track: '#3a362f',
     warn: '#e0a96d'
+  },
+  opencode: {
+    name: 'opencode',
+    label: 'opencode',
+    background: '#0f0f0f',
+    foreground: '#edecee',
+    dim: '#6d6d6d',
+    accent: '#a277ff',
+    track: '#2d2d2d',
+    warn: '#ffca85'
   }
 };
 

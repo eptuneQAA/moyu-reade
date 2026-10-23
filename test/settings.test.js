@@ -16,10 +16,14 @@ test('settings expose theme and the three density options', () => {
   );
 });
 
-test('theme cycles between paper and night', () => {
+test('theme cycles through paper, night and opencode', () => {
   assert.equal(adjustValue(BASE, 'theme', 1), 'night');
-  assert.equal(adjustValue({ ...BASE, theme: 'night' }, 'theme', 1), 'paper');
-  assert.equal(adjustValue(BASE, 'theme', -1), 'night');
+  assert.equal(adjustValue({ ...BASE, theme: 'night' }, 'theme', 1), 'opencode');
+  assert.equal(
+    adjustValue({ ...BASE, theme: 'opencode' }, 'theme', 1),
+    'paper'
+  );
+  assert.equal(adjustValue(BASE, 'theme', -1), 'opencode');
 });
 
 test('charsPerLine clamps to 40..120', () => {

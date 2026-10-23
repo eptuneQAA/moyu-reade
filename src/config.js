@@ -8,7 +8,7 @@ export const DEFAULT_CONFIG = {
   autoPageSeconds: 30,
   booksDirs: ['~/Documents/Books', '~/Downloads'],
   showChapterTitle: true,
-  showFooter: false,
+  showFooter: true,
   theme: 'paper'
 };
 

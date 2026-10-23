@@ -74,7 +74,9 @@ export default function Reader({
 
       {config.showFooter ? (
         <Text color={theme.dim} wrap="truncate-end">
-          Space 翻页  j/k 滚动  g 目录  / 搜索  S 设置  a 自动  ~ 伪装  ? 帮助  q 退出
+          {width >= 76
+            ? 'Space 翻页  j/k 滚动  g 目录  / 搜索  S 设置  a 自动  ~ 伪装  ? 帮助  q 退出'
+            : '空格 翻页  j/k 滚动  g 目录  / 搜索  S 设置  ~ 伪装  ? 帮助  q 退出'}
         </Text>
       ) : null}
     </Box>

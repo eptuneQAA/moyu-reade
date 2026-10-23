@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "esbuild src/cli.js --bundle --platform=node --format=esm --packages=external --jsx=automatic --outfile=dist/cli.js --sourcemap",
+    "prepare": "npm run build",
     "start": "node dist/cli.js",
     "dev": "npm run build && node dist/cli.js",
     "test": "node --test"

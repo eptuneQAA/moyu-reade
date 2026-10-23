@@ -11,8 +11,8 @@ export function createBook(meta) {
   return { ...meta, lines, lineStarts, textLength: offset };
 }
 
-export function layout(book, width) {
-  return buildRows(book.lines, width, book.lineStarts);
+export function layout(book, width, options = {}) {
+  return buildRows(book.lines, width, book.lineStarts, options);
 }
 
 export function offsetForLine(book, line) {

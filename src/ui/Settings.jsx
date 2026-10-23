@@ -1,8 +1,13 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import { SETTINGS } from '../core/settings.js';
+import { THEMES } from './theme.js';
 
 function valueLabel(config, key, autoLines) {
+  if (key === 'theme') {
+    const theme = THEMES[config.theme] || THEMES.paper;
+    return theme.label;
+  }
   if (key === 'charsPerLine') {
     const value = config.charsPerLine;
     return `${value} 列（约 ${Math.floor(value / 2)} 汉字）`;
@@ -16,23 +21,35 @@ function valueLabel(config, key, autoLines) {
   return `${config.autoPageSeconds} 秒`;
 }
 
-export default function Settings({ config, cursor, autoLines, width, pad }) {
+export default function Settings({
+  config,
+  cursor,
+  autoLines,
+  width,
+  pad,
+  theme
+}) {
   return (
     <Box
       flexDirection="column"
       width={width}
       marginLeft={pad}
       borderStyle="round"
+      borderColor={theme.track}
       paddingX={1}
     >
-      <Text bold color="cyan">阅读设置</Text>
+      <Text bold color={theme.accent}>阅读设置</Text>
       {SETTINGS.map((setting, index) => (
-        <Text key={setting.key} inverse={index === cursor}>
+        <Text
+          key={setting.key}
+          color={theme.foreground}
+          inverse={index === cursor}
+        >
           {index === cursor ? '> ' : '  '}
           {setting.label}：{valueLabel(config, setting.key, autoLines)}
         </Text>
       ))}
-      <Text dimColor>↑/↓ 选择  ←/→ 调整  Esc 保存并关闭</Text>
+      <Text color={theme.dim}>↑/↓ 选择  ←/→ 调整  Esc 保存并关闭</Text>
     </Box>
   );
 }

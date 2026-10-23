@@ -2,13 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { adjustValue, SETTINGS } from '../src/core/settings.js';
 
-const BASE = { charsPerLine: 100, linesPerPage: 0, autoPageSeconds: 30 };
+const BASE = {
+  theme: 'paper',
+  charsPerLine: 100,
+  linesPerPage: 0,
+  autoPageSeconds: 30
+};
 
-test('settings expose the three density options', () => {
+test('settings expose theme and the three density options', () => {
   assert.deepEqual(
     SETTINGS.map((setting) => setting.key),
-    ['charsPerLine', 'linesPerPage', 'autoPageSeconds']
+    ['theme', 'charsPerLine', 'linesPerPage', 'autoPageSeconds']
   );
+});
+
+test('theme cycles between paper and night', () => {
+  assert.equal(adjustValue(BASE, 'theme', 1), 'night');
+  assert.equal(adjustValue({ ...BASE, theme: 'night' }, 'theme', 1), 'paper');
+  assert.equal(adjustValue(BASE, 'theme', -1), 'night');
 });
 
 test('charsPerLine clamps to 40..120', () => {

@@ -14,27 +14,42 @@ export default function Reader({
   width,
   pad,
   autoPage,
-  highlight
+  highlight,
+  theme,
+  toast
 }) {
   const page = rows.slice(rowIndex, rowIndex + pageHeight);
   const percent = percentForOffset(book, offset);
-  const heading = config.showChapterTitle
-    ? `${truncateToWidth(book.title, 24)} · ${truncateToWidth(
-        chapter ? chapter.title : '',
-        30
-      )}  `
-    : '';
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageHeight));
+  const currentPage = Math.min(
+    totalPages,
+    Math.floor(rowIndex / pageHeight) + 1
+  );
+  const barWidth = Math.max(8, Math.min(24, width - 8));
+  const filled = Math.round((percent / 100) * barWidth);
+  const titleWidth = Math.max(4, Math.floor(width / 2) - 2);
 
   return (
     <Box flexDirection="column" width={width} marginLeft={pad}>
-      <Text dimColor wrap="truncate-end">
-        {heading}
-        {percent}%{autoPage ? '  [自动翻页]' : ''}
-      </Text>
-      <Box flexDirection="column" height={pageHeight}>
+      {config.showChapterTitle ? (
+        <>
+          <Box justifyContent="space-between" width={width}>
+            <Text color={theme.dim}>
+              {truncateToWidth(book.title, titleWidth)}
+            </Text>
+            <Text color={theme.dim}>
+              {truncateToWidth(chapter ? chapter.title : '', titleWidth)}
+            </Text>
+          </Box>
+          <Text color={theme.track}>{'─'.repeat(width)}</Text>
+        </>
+      ) : null}
+
+      <Box flexDirection="column" height={pageHeight} marginTop={1}>
         {page.map((row, index) => (
           <Text
             key={`${row.start}-${index}`}
+            color={theme.foreground}
             wrap="truncate-end"
             inverse={Boolean(highlight && highlight.line === row.line)}
           >
@@ -42,8 +57,23 @@ export default function Reader({
           </Text>
         ))}
       </Box>
+
+      <Box flexDirection="column" alignItems="center" marginTop={1}>
+        <Text>
+          <Text color={theme.accent}>{'━'.repeat(filled)}</Text>
+          <Text color={theme.track}>{'─'.repeat(barWidth - filled)}</Text>
+        </Text>
+        <Text color={toast ? theme.warn : theme.dim}>
+          {toast
+            ? toast
+            : `第 ${currentPage} 页 / 共 ${totalPages} 页   ${percent}%${
+                autoPage ? '   自动翻页' : ''
+              }`}
+        </Text>
+      </Box>
+
       {config.showFooter ? (
-        <Text dimColor wrap="truncate-end">
+        <Text color={theme.dim} wrap="truncate-end">
           Space 翻页  j/k 滚动  g 目录  / 搜索  S 设置  a 自动  ~ 伪装  ? 帮助  q 退出
         </Text>
       ) : null}

@@ -40,6 +40,16 @@ test('buildRows records absolute offsets', () => {
   );
 });
 
+test('buildRows indents body lines but not chapter headings', () => {
+  const rows = buildRows(['第一章', '正文'], 10, [0, 4], {
+    indent: true,
+    chapterStarts: new Set([0])
+  });
+  assert.equal(rows[0].text, '第一章');
+  assert.equal(rows[1].text, '\u3000\u3000正文');
+  assert.equal(rows[1].start, 4);
+});
+
 test('offsetToRow finds the row containing an offset', () => {
   const rows = [{ start: 0 }, { start: 5 }, { start: 10 }];
   assert.equal(offsetToRow(rows, 0), 0);

@@ -23,6 +23,7 @@ import Search from './Search.jsx';
 import Settings from './Settings.jsx';
 import Help from './Help.jsx';
 import Disguise from './Disguise.jsx';
+import { themeOf } from './theme.js';
 
 export default function App({ initialFile = null, noResume = false }) {
   const { exit } = useApp();
@@ -86,17 +87,30 @@ export default function App({ initialFile = null, noResume = false }) {
     return () => clearTimeout(id);
   }, [highlight]);
 
+  const theme = themeOf(config.theme);
   const textWidth = Math.max(20, Math.min(config.charsPerLine, cols - 2));
   const pad = Math.max(0, Math.floor((cols - textWidth) / 2));
-  const autoLines = Math.max(5, rows - 6);
+  const chrome =
+    (config.showChapterTitle ? 2 : 0) + 4 + (config.showFooter ? 1 : 0);
+  const autoLines = Math.max(5, rows - chrome);
   const pageHeight =
     config.linesPerPage > 0
       ? Math.min(config.linesPerPage, autoLines)
       : autoLines;
 
+  const chapterStarts = useMemo(
+    () => new Set(book ? book.chapters.map((item) => item.startLine) : []),
+    [book]
+  );
   const rowsData = useMemo(
-    () => (book ? layout(book, textWidth) : []),
-    [book, textWidth]
+    () =>
+      book
+        ? layout(book, textWidth, {
+            indent: book.format !== 'pdf',
+            chapterStarts
+          })
+        : [],
+    [book, textWidth, chapterStarts]
   );
   const rowIndex = useMemo(
     () => offsetToRow(rowsData, offset),
@@ -228,18 +242,18 @@ export default function App({ initialFile = null, noResume = false }) {
   const pageDown = useCallback(() => {
     if (rowsData.length === 0) return;
     const index = offsetToRow(rowsData, offsetRef.current);
-    if (index + pageHeight >= rowsData.length) {
-      const lastStart = Math.max(0, rowsData.length - pageHeight);
-      setOffset(rowsData[lastStart].start);
-      return;
-    }
-    setOffset(rowsData[index + pageHeight].start);
+    const pageStart = Math.floor(index / pageHeight) * pageHeight;
+    const lastPageStart =
+      Math.floor((rowsData.length - 1) / pageHeight) * pageHeight;
+    const target = Math.min(pageStart + pageHeight, lastPageStart);
+    setOffset(rowsData[target].start);
   }, [rowsData, pageHeight]);
 
   const pageUp = useCallback(() => {
     if (rowsData.length === 0) return;
     const index = offsetToRow(rowsData, offsetRef.current);
-    setOffset(rowsData[Math.max(0, index - pageHeight)].start);
+    const pageStart = Math.floor(index / pageHeight) * pageHeight;
+    setOffset(rowsData[Math.max(0, pageStart - pageHeight)].start);
   }, [rowsData, pageHeight]);
 
   const lineDown = useCallback(
@@ -315,12 +329,13 @@ export default function App({ initialFile = null, noResume = false }) {
     }
     const id = setInterval(() => {
       const index = offsetToRow(rowsData, offsetRef.current);
-      if (index + pageHeight >= rowsData.length) {
+      const pageStart = Math.floor(index / pageHeight) * pageHeight;
+      if (pageStart + pageHeight >= rowsData.length) {
         setAutoPage(false);
         setToast('已到末尾');
         return;
       }
-      setOffset(rowsData[index + pageHeight].start);
+      setOffset(rowsData[pageStart + pageHeight].start);
     }, config.autoPageSeconds * 1000);
     return () => clearInterval(id);
   }, [
@@ -575,13 +590,19 @@ export default function App({ initialFile = null, noResume = false }) {
   if (disguise) return <Disguise rows={rows} />;
 
   return (
-    <Box flexDirection="column" width={cols}>
+    <Box
+      flexDirection="column"
+      width={cols}
+      height={rows}
+      backgroundColor={theme.background}
+    >
       {overlay === 'toc' ? (
         <Toc
           chapters={book.chapters}
           cursor={tocCursor}
           width={textWidth}
           pad={pad}
+          theme={theme}
         />
       ) : null}
       {overlay === 'search' ? (
@@ -592,6 +613,7 @@ export default function App({ initialFile = null, noResume = false }) {
           chapters={book.chapters}
           width={textWidth}
           pad={pad}
+          theme={theme}
         />
       ) : null}
       {overlay === 'settings' ? (
@@ -601,9 +623,12 @@ export default function App({ initialFile = null, noResume = false }) {
           autoLines={autoLines}
           width={textWidth}
           pad={pad}
+          theme={theme}
         />
       ) : null}
-      {overlay === 'help' ? <Help width={textWidth} pad={pad} /> : null}
+      {overlay === 'help' ? (
+        <Help width={textWidth} pad={pad} theme={theme} />
+      ) : null}
       {!overlay ? (
         <Reader
           rows={rowsData}
@@ -617,9 +642,10 @@ export default function App({ initialFile = null, noResume = false }) {
           pad={pad}
           autoPage={autoPage}
           highlight={highlight}
+          theme={theme}
+          toast={toast}
         />
       ) : null}
-      {toast ? <Text color="yellow">{toast}</Text> : null}
     </Box>
   );
 }

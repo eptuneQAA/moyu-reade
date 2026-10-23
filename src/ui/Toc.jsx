@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 
-export default function Toc({ chapters, cursor, width, pad }) {
+export default function Toc({ chapters, cursor, width, pad, theme }) {
   const windowSize = 15;
   let start = Math.max(0, cursor - Math.floor(windowSize / 2));
   start = Math.min(start, Math.max(0, chapters.length - windowSize));
@@ -13,14 +13,16 @@ export default function Toc({ chapters, cursor, width, pad }) {
       width={width}
       marginLeft={pad}
       borderStyle="round"
+      borderColor={theme.track}
       paddingX={1}
     >
-      <Text bold color="cyan">目录（{chapters.length} 章）</Text>
+      <Text bold color={theme.accent}>目录（{chapters.length} 章）</Text>
       {visible.map((chapter, index) => {
         const absolute = start + index;
         return (
           <Text
             key={chapter.startLine}
+            color={theme.foreground}
             inverse={absolute === cursor}
             wrap="truncate-end"
           >
@@ -29,7 +31,7 @@ export default function Toc({ chapters, cursor, width, pad }) {
           </Text>
         );
       })}
-      <Text dimColor>j/k 选择  Enter 跳转  Esc 关闭</Text>
+      <Text color={theme.dim}>j/k 选择  Enter 跳转  Esc 关闭</Text>
     </Box>
   );
 }

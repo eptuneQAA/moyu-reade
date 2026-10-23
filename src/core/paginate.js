@@ -74,13 +74,21 @@ export function wrapLine(text, width) {
   return rows.length > 0 ? rows : [{ text: '', col: 0 }];
 }
 
-export function buildRows(lines, width, lineStarts) {
+export function buildRows(lines, width, lineStarts, options = {}) {
   const rows = [];
+  const chapterStarts = options.chapterStarts;
   for (let i = 0; i < lines.length; i++) {
-    for (const row of wrapLine(lines[i], width)) {
+    const line = lines[i];
+    const indent =
+      options.indent &&
+      line.trim() !== '' &&
+      !(chapterStarts && chapterStarts.has(i))
+        ? '\u3000\u3000'
+        : '';
+    for (const row of wrapLine(indent + line, width)) {
       rows.push({
         text: row.text,
-        start: lineStarts[i] + row.col,
+        start: lineStarts[i] + Math.max(0, row.col - indent.length),
         line: i
       });
     }

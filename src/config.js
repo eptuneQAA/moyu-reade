@@ -3,12 +3,13 @@ import path from 'node:path';
 import os from 'node:os';
 
 export const DEFAULT_CONFIG = {
-  charsPerLine: 100,
+  charsPerLine: 72,
   linesPerPage: 0,
   autoPageSeconds: 30,
   booksDirs: ['~/Documents/Books', '~/Downloads'],
   showChapterTitle: true,
-  showFooter: true
+  showFooter: false,
+  theme: 'paper'
 };
 
 export function configDir() {

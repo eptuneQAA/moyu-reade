@@ -461,6 +461,8 @@ export default function App({ initialFile = null, noResume = false }) {
       setOverlay(null);
       return;
     }
+    if (key.downArrow) return pageDown();
+    if (key.upArrow) return pageUp();
     if (input === ' ') return pageDown();
     if (key.pageDown || input === 'f') return pageDown();
     if (key.pageUp || input === 'b') return pageUp();

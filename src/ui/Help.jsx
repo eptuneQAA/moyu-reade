@@ -2,8 +2,8 @@ import React from 'react';
 import { Box, Text } from 'ink';
 
 const KEYS = [
-  ['Space / PgDn / f', '下一页'],
-  ['b / PgUp', '上一页'],
+  ['Space / PgDn / f / ↓', '下一页'],
+  ['b / PgUp / ↑', '上一页'],
   ['j / k', '下 / 上滚动一行'],
   ['d / u', '下 / 上半页'],
   ['n / p', '下一章 / 上一章'],

@@ -1,11 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  cleanTitle,
   decodeEntities,
   htmlToLines,
   detectChapterStarts,
   splitChapters
 } from '../src/parsers/text.js';
+
+test('cleanTitle strips trailing bracket metadata', () => {
+  assert.equal(cleanTitle('凡人修仙传 [更新至第一千六百章]'), '凡人修仙传');
+  assert.equal(cleanTitle('凡人修仙传【全本】'), '凡人修仙传');
+  assert.equal(cleanTitle('[综]某书'), '[综]某书');
+});
 
 test('decodeEntities decodes named and numeric entities', () => {
   assert.equal(decodeEntities('a&amp;b &#20013; &#x6587; &lt;'), 'a&b 中 文 <');

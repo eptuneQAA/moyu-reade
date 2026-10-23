@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import iconv from 'iconv-lite';
-import { splitChapters } from './text.js';
+import { cleanTitle, splitChapters } from './text.js';
 import { ParseError } from './error.js';
 
 export function decodeBuffer(buffer) {
@@ -34,7 +34,7 @@ export function parseTxt(file) {
   if (lines.length === 0) throw new ParseError('文件内容为空');
 
   return {
-    title: path.basename(file, path.extname(file)),
+    title: cleanTitle(path.basename(file, path.extname(file))),
     author: null,
     format: 'txt',
     sourcePath: path.resolve(file),

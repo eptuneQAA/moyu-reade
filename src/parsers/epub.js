@@ -1,6 +1,11 @@
 import AdmZip from 'adm-zip';
 import path from 'node:path';
-import { decodeEntities, htmlToLines, splitChapters } from './text.js';
+import {
+  cleanTitle,
+  decodeEntities,
+  htmlToLines,
+  splitChapters
+} from './text.js';
 import { ParseError } from './error.js';
 
 function attrs(tag) {
@@ -91,7 +96,7 @@ export function parseEpub(file) {
   const authorMatch = opf.match(/<dc:creator\b[^>]*>([\s\S]*?)<\/dc:creator>/i);
   const title = titleMatch
     ? textOf(titleMatch[1])
-    : path.basename(file, path.extname(file));
+    : cleanTitle(path.basename(file, path.extname(file)));
   const author = authorMatch ? textOf(authorMatch[1]) : null;
 
   const manifest = {};

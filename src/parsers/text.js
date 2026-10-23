@@ -60,6 +60,13 @@ export function htmlToLines(html) {
   return out;
 }
 
+export function cleanTitle(raw) {
+  const text = String(raw || '').trim();
+  const cut = text.search(/[\u005b\u3010]/);
+  if (cut > 1) return text.slice(0, cut).trim();
+  return text;
+}
+
 export function detectChapterStarts(lines) {
   const chapters = [];
   for (let i = 0; i < lines.length; i++) {

@@ -36,6 +36,14 @@ test('decodeBuffer handles UTF-16LE BOM', () => {
   assert.equal(decodeBuffer(buffer), '第一章 你好');
 });
 
+test('parseTxt strips bracketed metadata from the filename', () => {
+  const file = tmpFile(
+    '凡人修仙传 [更新至第一千六百章].txt',
+    Buffer.from('第一章 开始\n正文\n\n第二章 继续\n正文\n', 'utf8')
+  );
+  assert.equal(parseTxt(file).title, '凡人修仙传');
+});
+
 test('parseTxt builds metadata and chapters', () => {
   const file = tmpFile(
     '测试书.txt',

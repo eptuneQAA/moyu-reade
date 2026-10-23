@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { detectChapterStarts } from './text.js';
+import { cleanTitle, detectChapterStarts } from './text.js';
 import { ParseError } from './error.js';
 
 export function parsePdfText(raw) {
@@ -69,7 +69,7 @@ export function parsePdf(file) {
 
   const parsed = parsePdfText(raw);
   return {
-    title: path.basename(file, path.extname(file)),
+    title: cleanTitle(path.basename(file, path.extname(file))),
     author: null,
     format: 'pdf',
     sourcePath: path.resolve(file),

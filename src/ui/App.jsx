@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Text, useApp, useInput, useStdout } from 'ink';
+import fs from 'node:fs';
 import os from 'node:os';
 import { loadConfig, saveConfig } from '../config.js';
 import { bookKey, loadProgress, saveProgress } from '../core/store.js';
@@ -130,7 +131,7 @@ export default function App({ initialFile = null, noResume = false }) {
           path: entry.path,
           title: entry.title,
           format: entry.path.split('.').pop().toLowerCase(),
-          missing: true,
+          missing: !fs.existsSync(entry.path),
           progress: entry
         });
       }

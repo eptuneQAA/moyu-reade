@@ -22,6 +22,12 @@ export function parsePdfText(raw) {
     lines.push(...pageLines);
   }
   while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
+  while (
+    pageStarts.length > 0 &&
+    pageStarts[pageStarts.length - 1] === lines.length
+  ) {
+    pageStarts.pop();
+  }
 
   if (lines.every((line) => line.trim() === '')) {
     throw new ParseError('该 PDF 无文字层（可能是扫描版），暂不支持');
@@ -33,10 +39,10 @@ export function parsePdfText(raw) {
     chapters = starts;
   } else {
     chapters = [];
-    for (let i = 0; i < pages.length; i += 10) {
+    for (let i = 0; i < pageStarts.length; i += 10) {
       chapters.push({
-        title: `第 ${i + 1}-${Math.min(i + 10, pages.length)} 页`,
-        startLine: pageStarts[i] ?? lines.length
+        title: `第 ${i + 1}-${Math.min(i + 10, pageStarts.length)} 页`,
+        startLine: pageStarts[i]
       });
     }
   }

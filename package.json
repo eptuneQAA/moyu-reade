@@ -1,0 +1,25 @@
+{
+  "name": "moyu-reader",
+  "version": "0.1.0",
+  "description": "Terminal novel reader",
+  "type": "module",
+  "bin": {
+    "moyu": "bin/moyu"
+  },
+  "scripts": {
+    "build": "esbuild src/cli.js --bundle --platform=node --format=esm --packages=external --jsx=automatic --outfile=dist/cli.js --sourcemap",
+    "start": "node dist/cli.js",
+    "dev": "npm run build && node dist/cli.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "adm-zip": "^0.6.1",
+    "iconv-lite": "^0.7.3",
+    "ink": "^8.0.0",
+    "react": "^19.3.1",
+    "string-width": "^8.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

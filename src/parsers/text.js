@@ -61,10 +61,24 @@ export function htmlToLines(html) {
 }
 
 export function cleanTitle(raw) {
-  const text = String(raw || '').trim();
+  const original = String(raw || '').trim();
+  let text = original;
+
+  const quoted = text.match(/^\u300a([^\u300b]+)\u300b/);
+  if (quoted) text = quoted[1].trim();
+
   const cut = text.search(/[\u005b\u3010]/);
-  if (cut > 1) return text.slice(0, cut).trim();
-  return text;
+  if (cut > 1) text = text.slice(0, cut).trim();
+
+  text = text
+    .replace(
+      /\s*[\uff08(](全本|完结|校对|精校|番外|TXT)[^\uff09)]*[\uff09)]\s*$/iu,
+      ''
+    )
+    .replace(/\s*作者[:：].*$/u, '')
+    .trim();
+
+  return text || original;
 }
 
 export function detectChapterStarts(lines) {

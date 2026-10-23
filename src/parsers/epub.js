@@ -95,7 +95,7 @@ export function parseEpub(file) {
   const titleMatch = opf.match(/<dc:title\b[^>]*>([\s\S]*?)<\/dc:title>/i);
   const authorMatch = opf.match(/<dc:creator\b[^>]*>([\s\S]*?)<\/dc:creator>/i);
   const title = titleMatch
-    ? textOf(titleMatch[1])
+    ? cleanTitle(textOf(titleMatch[1]))
     : cleanTitle(path.basename(file, path.extname(file)));
   const author = authorMatch ? textOf(authorMatch[1]) : null;
 

@@ -8,9 +8,15 @@ import {
   splitChapters
 } from '../src/parsers/text.js';
 
-test('cleanTitle strips trailing bracket metadata', () => {
+test('cleanTitle strips file name metadata', () => {
   assert.equal(cleanTitle('凡人修仙传 [更新至第一千六百章]'), '凡人修仙传');
   assert.equal(cleanTitle('凡人修仙传【全本】'), '凡人修仙传');
+  assert.equal(cleanTitle('凡人修仙传[ 更新至 第一千六百零九章 出手 ]'), '凡人修仙传');
+  assert.equal(
+    cleanTitle('《凡人修仙传》（校对版全本+番外）作者：忘语'),
+    '凡人修仙传'
+  );
+  assert.equal(cleanTitle('凡人修仙传（全本）'), '凡人修仙传');
   assert.equal(cleanTitle('[综]某书'), '[综]某书');
 });
 

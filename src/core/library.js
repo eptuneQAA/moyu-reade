@@ -33,7 +33,7 @@ export function scanBooks(dirs) {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) {
         walk(full, depth + 1);
-      } else if (/\.(txt|epub|pdf)$/i.test(entry.name)) {
+      } else if (/\.(txt|epub|pdf|md)$/i.test(entry.name)) {
         const real = realOrResolved(full);
         if (seen.has(real)) continue;
         seen.add(real);

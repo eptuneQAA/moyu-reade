@@ -1,0 +1,24 @@
+Source: moyu
+Section: utils
+Priority: optional
+Maintainer: moyu-reader contributors <moyu-reader@users.noreply.github.com>
+Build-Depends: debhelper (>= 13)
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
+
+Package: moyu
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: nodejs (>= 22), xdg-utils
+Suggests: poppler-utils
+Description: terminal and web novel reader for TXT, EPUB, PDF and Markdown
+ moyu is a local novel reader with a terminal UI and a local web reader.
+ It supports chapter navigation, full-text search, reading progress,
+ Kindle-style typography, paper themes, and a one-key disguise screen
+ in the terminal.
+ .
+ The web reader is started with "moyu web" and provides a cover
+ bookshelf, typography controls, paged or scrolling reading, and
+ page-turn animations. It can be installed as a Chrome web app and reads
+ TXT, EPUB, PDF, and Markdown files from local
+ directories. PDF support requires pdftotext from poppler-utils.

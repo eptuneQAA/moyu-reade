@@ -73,7 +73,7 @@ function readToc(zip, opfPath, manifest) {
   return [];
 }
 
-export function parseEpub(file) {
+function openEpub(file) {
   let zip;
   try {
     zip = new AdmZip(file);
@@ -113,6 +113,54 @@ export function parseEpub(file) {
     : [];
   if (spine.length === 0) throw new ParseError('EPUB spine 为空');
 
+  return { zip, opfPath, opf, manifest, spine, title, author };
+}
+
+function findCoverItem(opf, manifest) {
+  const meta = opf.match(
+    /<meta\b[^>]*name="cover"[^>]*content="([^"]+)"/i
+  );
+  if (meta && manifest[meta[1]]) return manifest[meta[1]];
+
+  const byProperty = Object.values(manifest).find((item) =>
+    (item.properties || '').split(/\s+/).includes('cover-image')
+  );
+  if (byProperty) return byProperty;
+
+  return (
+    Object.values(manifest).find(
+      (item) =>
+        /^image\//.test(item['media-type'] || '') &&
+        /cover/i.test(`${item.id} ${item.href}`)
+    ) || null
+  );
+}
+
+export function readEpubMetadata(file) {
+  const { opfPath, opf, manifest, title, author } = openEpub(file);
+  const cover = findCoverItem(opf, manifest);
+  return {
+    title,
+    author,
+    coverPath: cover ? resolveHref(opfPath, cover.href) : null,
+    coverMime: cover ? cover['media-type'] || 'image/jpeg' : null
+  };
+}
+
+export function readEpubCover(file) {
+  const { zip, opfPath, opf, manifest } = openEpub(file);
+  const cover = findCoverItem(opf, manifest);
+  if (!cover) return null;
+  const entry = zip.getEntry(resolveHref(opfPath, cover.href));
+  if (!entry) return null;
+  return {
+    mime: cover['media-type'] || 'image/jpeg',
+    data: entry.getData()
+  };
+}
+
+export function parseEpub(file) {
+  const { zip, opfPath, manifest, spine, title, author } = openEpub(file);
   const docs = [];
   const lines = [];
   for (const id of spine) {

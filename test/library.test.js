@@ -16,18 +16,19 @@ test('scanBooks finds supported files recursively and skips hidden', () => {
   fs.writeFileSync(path.join(root, 'a.txt'), '');
   fs.writeFileSync(path.join(root, 'sub', 'b.epub'), '');
   fs.writeFileSync(path.join(root, 'sub', 'c.PDF'), '');
-  fs.writeFileSync(path.join(root, 'c.md'), '');
+  fs.writeFileSync(path.join(root, 'c.mobi'), '');
+  fs.writeFileSync(path.join(root, 'sub', 'd.md'), '');
   fs.mkdirSync(path.join(root, '.hidden'));
-  fs.writeFileSync(path.join(root, '.hidden', 'd.txt'), '');
+  fs.writeFileSync(path.join(root, '.hidden', 'e.txt'), '');
 
   const books = scanBooks([root]);
   assert.deepEqual(
     books.map((b) => b.title).sort(),
-    ['a', 'b', 'c']
+    ['a', 'b', 'c', 'd']
   );
   assert.ok(books.every((b) => path.isAbsolute(b.path)));
   assert.deepEqual(
     books.map((b) => b.format).sort(),
-    ['epub', 'pdf', 'txt']
+    ['epub', 'md', 'pdf', 'txt']
   );
 });

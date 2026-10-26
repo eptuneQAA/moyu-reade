@@ -1,0 +1,108 @@
+.TH MOYU 1 "2026-10-23" "moyu 0.1.0" "User Commands"
+.SH NAME
+moyu \- terminal novel reader for TXT, EPUB, PDF and Markdown
+.SH SYNOPSIS
+.B moyu
+[\fIOPTIONS\fR] [\fIFILE\fR]
+.br
+.B moyu web
+[\fB\-\-port\fR \fIN\fR] [\fB\-\-no\-open\fR] [\fImoyu://...\fR]
+.SH DESCRIPTION
+.B moyu
+is a local novel reader with a terminal interface and a local web reader.
+It provides chapter navigation, full-text search, reading progress,
+Kindle-style typography, paper themes, and a one-key disguise screen.
+.PP
+The web reader provides a cover bookshelf, typography controls, paged or
+scrolling reading, and page-turn animations.
+.PP
+It reads TXT, EPUB, PDF, and Markdown files from local directories. PDF support requires
+.B pdftotext
+from the poppler-utils package.
+.SH OPTIONS
+.TP
+.B web
+Start the local web reader and open it in the default browser.
+.PP
+The
+.B moyu://shelf
+and
+.B moyu://read/\fIid\fR
+URLs are handled by the desktop entry registered by this package.
+.TP
+.B \-\-port \fIN\fR
+Port for the web reader (default: 8787).
+.TP
+.B \-\-no\-open
+Start the web reader without opening a browser.
+.TP
+.B \-l, \-\-library
+Open the bookshelf instead of a file.
+.TP
+.B \-\-no\-resume
+Start reading from the beginning instead of the saved position.
+.TP
+.B \-\-debug
+Print detailed error output to stderr.
+.TP
+.B \-h, \-\-help
+Show help.
+.TP
+.B \-v, \-\-version
+Show version.
+.SH KEYS
+.TP
+.B Space, PageDown, f, Down
+Next page.
+.TP
+.B b, PageUp, Up
+Previous page.
+.TP
+.B j, k
+Scroll down or up one line.
+.TP
+.B d, u
+Scroll down or up half a page.
+.TP
+.B n, p
+Next or previous chapter.
+.TP
+.B g
+Table of contents.
+.TP
+.B /
+Search the current book.
+.TP
+.B s
+Bookshelf.
+.TP
+.B S, ,
+Settings.
+.TP
+.B a
+Toggle automatic page turning.
+.TP
+.B t
+Toggle the header.
+.TP
+.B h
+Toggle the key hint footer.
+.TP
+.B ~
+Show the disguise screen.
+.TP
+.B ?
+Help.
+.TP
+.B q
+Quit.
+.SH FILES
+.TP
+.I ~/.config/moyu/config.json
+User configuration.
+.TP
+.I ~/.config/moyu/progress.json
+Reading progress.
+.SH SEE ALSO
+.BR node (1),
+.BR pdftotext (1)

@@ -1,0 +1,31 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y debhelper dpkg-dev fakeroot
+
+      - name: Test and build deb
+        run: ./scripts/build-deb.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: moyu-deb
+          path: |
+            release/*.deb
+            release/SHA256SUMS

@@ -1,0 +1,16 @@
+moyu (0.2.0) unstable; urgency=medium
+
+  * Add local web reader with bookshelf, covers, typography settings,
+    paged and scrolling modes, and page-turn animations.
+  * Add shelf hide (keep file) and permanent local delete actions.
+  * Add Markdown reading and web file import for TXT/EPUB/PDF/Markdown.
+  * Add `moyu web` command, desktop launcher, moyu:// URL scheme and PWA
+    support.
+
+ -- moyu-reader contributors <moyu-reader@users.noreply.github.com>  Mon, 26 Oct 2026 10:18:48 +0800
+
+moyu (0.1.0) unstable; urgency=medium
+
+  * Initial release.
+
+ -- moyu-reader contributors <moyu-reader@users.noreply.github.com>  Fri, 23 Oct 2026 14:20:53 +0800

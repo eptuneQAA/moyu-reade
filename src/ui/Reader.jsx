@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import { truncateToWidth } from '../core/paginate.js';
+import { stripMarkdownForTerminal } from './markdownText.js';
 
 export default function Reader({
   rows,
@@ -69,16 +70,22 @@ export default function Reader({
       ) : null}
 
       <Box flexDirection="column" height={pageHeight} marginTop={1}>
-        {page.map((row, index) => (
-          <Text
-            key={`${row.start}-${index}`}
-            color={theme.foreground}
-            wrap="truncate-end"
-            inverse={Boolean(highlight && highlight.line === row.line)}
-          >
-            {row.text || ' '}
-          </Text>
-        ))}
+        {page.map((row, index) => {
+          const display =
+            book.format === 'md'
+              ? stripMarkdownForTerminal(row.text)
+              : row.text;
+          return (
+            <Text
+              key={`${row.start}-${index}`}
+              color={theme.foreground}
+              wrap="truncate-end"
+              inverse={Boolean(highlight && highlight.line === row.line)}
+            >
+              {display || ' '}
+            </Text>
+          );
+        })}
       </Box>
 
       <Box flexDirection="column" alignItems="center" marginTop={1}>

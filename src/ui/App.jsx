@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Text, useApp, useInput, useStdout } from 'ink';
 import fs from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import { loadConfig, saveConfig } from '../config.js';
 import { bookKey, loadProgress, saveProgress } from '../core/store.js';
 import { scanBooks } from '../core/library.js';
@@ -128,10 +129,18 @@ export default function App({ initialFile = null, noResume = false }) {
   );
 
   const refreshShelf = useCallback(() => {
-    setShelf(scanBooks(config.booksDirs));
-  }, [config.booksDirs]);
+    const hidden = new Set(
+      (config.hiddenBooks || []).map((file) => path.resolve(file))
+    );
+    setShelf(
+      scanBooks(config.booksDirs).filter((book) => !hidden.has(book.path))
+    );
+  }, [config.booksDirs, config.hiddenBooks]);
 
   const shelfItems = useMemo(() => {
+    const hidden = new Set(
+      (config.hiddenBooks || []).map((file) => path.resolve(file))
+    );
     const progressByPath = new Map(
       Object.values(progress.books).map((entry) => [entry.path, entry])
     );
@@ -140,6 +149,7 @@ export default function App({ initialFile = null, noResume = false }) {
       progress: progressByPath.get(item.path) || null
     }));
     for (const entry of Object.values(progress.books)) {
+      if (hidden.has(path.resolve(entry.path))) continue;
       if (!items.some((item) => item.path === entry.path)) {
         items.push({
           path: entry.path,
@@ -156,7 +166,7 @@ export default function App({ initialFile = null, noResume = false }) {
       if (at !== bt) return bt.localeCompare(at);
       return a.title.localeCompare(b.title);
     });
-  }, [shelf, progress]);
+  }, [shelf, progress, config.hiddenBooks]);
 
   const openBook = useCallback(
     (file) => {

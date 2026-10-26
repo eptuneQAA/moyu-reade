@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	test -f dist/moyu.bundle.js
+	test -f web/dist/index.html
+
+override_dh_auto_test:
+
+override_dh_auto_install:
+	install -D -m 0755 debian/moyu.sh debian/moyu/usr/bin/moyu
+	install -D -m 0644 dist/moyu.bundle.js debian/moyu/usr/lib/moyu/moyu.bundle.js
+	install -d debian/moyu/usr/share/moyu/web
+	cp -a web/dist/. debian/moyu/usr/share/moyu/web/
+	install -D -m 0644 debian/moyu.desktop debian/moyu/usr/share/applications/moyu.desktop
+	install -D -m 0644 debian/moyu.svg debian/moyu/usr/share/icons/hicolor/scalable/apps/moyu.svg

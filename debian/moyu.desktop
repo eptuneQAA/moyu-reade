@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=moyu
+Name[zh_CN]=moyu 阅读器
+Comment=Local novel reader for TXT, EPUB and PDF
+Comment[zh_CN]=本地小说阅读器
+Exec=moyu web %u
+Terminal=false
+Categories=Office;Viewer;
+Keywords=novel;reader;epub;pdf;markdown;book;
+MimeType=x-scheme-handler/moyu;
+Icon=moyu
+StartupNotify=true

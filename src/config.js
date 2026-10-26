@@ -9,7 +9,8 @@ export const DEFAULT_CONFIG = {
   booksDirs: ['~/Documents/Books', '~/Downloads'],
   showChapterTitle: true,
   showFooter: true,
-  theme: 'paper'
+  theme: 'paper',
+  hiddenBooks: []
 };
 
 export function configDir() {

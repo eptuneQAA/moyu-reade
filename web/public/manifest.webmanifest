@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "moyu 阅读器",
+  "short_name": "moyu",
+  "description": "本地小说阅读器，支持 TXT / EPUB / PDF / Markdown",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
+  "categories": ["books", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "moyu",
+      "url": "/?moyu=%s"
+    }
+  ]
+}

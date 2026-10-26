@@ -1,3 +1,15 @@
 node_modules/
 dist/
+web/dist/
+release/
 *.log
+*.deb
+.DS_Store
+
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/moyu/
+debian/*.substvars
+debian/*.debhelper
+debian/*.debhelper.log

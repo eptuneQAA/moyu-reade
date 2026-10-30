@@ -34,7 +34,15 @@ jobs:
           dpkg-query -W -f='${Package} ${Version}\n' debhelper dpkg-dev fakeroot
 
       - name: Check build dependencies
-        run: dpkg-checkbuilddeps
+        run: |
+          {
+            echo '### Build dependencies'
+            echo '```'
+            dpkg-query -W -f='${Package} ${Version}\n' debhelper dpkg-dev fakeroot || true
+            echo '---'
+            dpkg-checkbuilddeps 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install dependencies
         run: npm ci

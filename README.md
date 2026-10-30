@@ -37,6 +37,11 @@ sudo dpkg -i moyu_0.2.0_all.deb
 moyu --version
 ```
 
+下载地址：
+
+- 最新自动构建：<https://github.com/eptuneQAA/moyu-reade/releases/tag/latest>
+- 全部版本：<https://github.com/eptuneQAA/moyu-reade/releases>
+
 安装后应用菜单里会出现 **moyu 阅读器**，双击即可启动 Web 版。
 
 如果 Node.js 是通过 nvm 安装的，`moyu` 会自动在 `~/.config/nvm` 和 `~/.nvm` 下寻找 22+ 的版本。
@@ -184,12 +189,17 @@ npm ci
 
 打包脚本会运行测试，生成 `dist/moyu.bundle.js` 和 `web/dist`，然后调用 `dpkg-buildpackage`。需要安装 `debhelper`、`dpkg-dev`、`fakeroot`。
 
-推送 `v` 开头的 tag 会触发 GitHub Actions 自动构建 deb 并创建 Release：
+GitHub Actions 的打包方式：
+
+- 每次推送 `main`：自动跑测试、构建 deb，并更新 `latest` 预发布包（<https://github.com/eptuneQAA/moyu-reade/releases/tag/latest>）
+- 推送 `v` 开头的 tag：自动构建 deb 并创建对应版本 Release
 
 ```bash
 git tag v0.2.0
 git push origin v0.2.0
 ```
+
+也可以手动触发 `release` workflow，填入要发布的 tag。
 
 ## 开发
 

@@ -4,15 +4,22 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '要发布的 tag，例如 v0.2.0'
+        required: true
 
 permissions:
   contents: write
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - uses: actions/setup-node@v4
         with:
@@ -25,14 +32,17 @@ jobs:
           sudo apt-get install -y debhelper dpkg-dev fakeroot
 
       - name: Build deb
+        env:
+          MOYU_DPKG_FLAGS: '-d'
         run: ./scripts/build-deb.sh
 
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
+          gh release create "${TAG}" \
             release/*.deb \
             release/SHA256SUMS \
-            --title "moyu ${GITHUB_REF_NAME}" \
+            --title "moyu ${TAG}" \
             --generate-notes

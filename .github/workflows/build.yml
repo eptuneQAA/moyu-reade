@@ -44,6 +44,11 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+          if ! output="$(dpkg-checkbuilddeps 2>&1)"; then
+            message="${output//$'\n'/ }"
+            echo "::warning::dpkg-checkbuilddeps: ${message}"
+          fi
+
       - name: Install dependencies
         run: npm ci
 

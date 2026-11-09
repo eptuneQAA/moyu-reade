@@ -1315,6 +1315,34 @@ button {
   letter-spacing: -0.02em;
 }
 
+.toc-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toc-order {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+
+.toc-order button {
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.toc-order button.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
 .panel-input {
   width: 100%;
   margin-bottom: 12px;

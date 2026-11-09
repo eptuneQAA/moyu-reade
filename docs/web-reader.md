@@ -112,6 +112,7 @@ web/
 - 主题：paper / sepia / green / solarized / night / black / opencode / blue / auto
 - 字体：宋体 / 黑体 / 楷体 / 仿宋 / 隶书
 - 默认隐藏书名/章节，标签页标题为 `moyu`；按 `t` 切换显示
+- 目录支持正序 / 倒序切换，倒序偏好保存在 `localStorage`
 - 阅读页按 `~` 切换假构建日志，任意键或点击返回
 - 字号：16–32；字距、段距、首行缩进、对齐
 - 行高：1.4–2.2

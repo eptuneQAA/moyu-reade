@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import { DEFAULT_CONFIG, saveConfig } from '../src/config.js';
@@ -206,6 +207,90 @@ test('web API serves library, chapters, search and progress', async () => {
       { method: 'DELETE' }
     );
     assert.equal(unauthenticatedDelete.status, 403);
+  } finally {
+    await server.close();
+    if (oldConfig === undefined) delete process.env.XDG_CONFIG_HOME;
+    else process.env.XDG_CONFIG_HOME = oldConfig;
+    if (oldCache === undefined) delete process.env.XDG_CACHE_HOME;
+    else process.env.XDG_CACHE_HOME = oldCache;
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+function rawRequest(url, { method = 'GET', headers = {} } = {}) {
+  return new Promise((resolve, reject) => {
+    const target = new URL(url);
+    const request = http.request(
+      {
+        hostname: target.hostname,
+        port: target.port,
+        path: `${target.pathname}${target.search}`,
+        method,
+        headers
+      },
+      (response) => {
+        response.resume();
+        response.on('end', () => resolve({ status: response.statusCode }));
+      }
+    );
+    request.on('error', reject);
+    request.end();
+  });
+}
+
+test('web API rejects spoofed Host and cross-site Origin', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'moyu-host-'));
+  const booksDir = path.join(root, 'books');
+  fs.mkdirSync(booksDir, { recursive: true });
+  fs.writeFileSync(path.join(booksDir, 'demo.txt'), '第一章 开始\n你好\n');
+
+  const oldConfig = process.env.XDG_CONFIG_HOME;
+  const oldCache = process.env.XDG_CACHE_HOME;
+  process.env.XDG_CONFIG_HOME = path.join(root, 'config');
+  process.env.XDG_CACHE_HOME = path.join(root, 'cache');
+  saveConfig({ ...DEFAULT_CONFIG, booksDirs: [booksDir] });
+
+  const server = await startWebServer({
+    port: 0,
+    open: false,
+    reuse: false,
+    quiet: true
+  });
+
+  try {
+    // 正常请求：Host 是 127.0.0.1
+    assert.equal((await rawRequest(`${server.url}/api/ping`)).status, 200);
+
+    // DNS rebinding 模拟：Host 被换成攻击者域名
+    const spoofedHost = await rawRequest(`${server.url}/api/library`, {
+      headers: { host: 'evil.example.com' }
+    });
+    assert.equal(spoofedHost.status, 403);
+
+    // 即使带上了 x-moyu 自定义头，写操作也必须被拒
+    const spoofedWrite = await rawRequest(`${server.url}/api/scan`, {
+      method: 'POST',
+      headers: { host: 'evil.example.com', 'x-moyu': '1' }
+    });
+    assert.equal(spoofedWrite.status, 403);
+
+    // 跨站 Origin 同理
+    const crossOrigin = await rawRequest(`${server.url}/api/library`, {
+      headers: { origin: 'http://evil.example.com' }
+    });
+    assert.equal(crossOrigin.status, 403);
+
+    // 本机 Origin 应放行
+    const sameOrigin = await rawRequest(`${server.url}/api/ping`, {
+      headers: { origin: server.url }
+    });
+    assert.equal(sameOrigin.status, 200);
+
+    // localhost 也是在允许列表里的
+    const localhostHost = await rawRequest(
+      `${server.url.replace('127.0.0.1', 'localhost')}/api/ping`
+    );
+    assert.equal(localhostHost.status, 200);
   } finally {
     await server.close();
     if (oldConfig === undefined) delete process.env.XDG_CONFIG_HOME;

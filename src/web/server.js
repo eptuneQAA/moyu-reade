@@ -38,6 +38,52 @@ class HttpError extends Error {
 
 const bookCache = new Map();
 
+// 只信任本机来源。校验 Host/Origin 是为了挡住 DNS rebinding：攻击者的域名一旦解析到
+// 127.0.0.1，浏览器就把它当同源，能带自定义头调用删除、导入、关闭等接口。
+const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '::1']);
+
+function normalizeHost(value) {
+  let text = String(value || '').trim().toLowerCase();
+  if (!text) return '';
+  if (text.startsWith('[')) {
+    // [::1]:8787
+    const end = text.indexOf(']');
+    return end === -1 ? '' : text.slice(1, end);
+  }
+  const colon = text.lastIndexOf(':');
+  // 只有 "主机:端口" 这种单冒号形式才截断，"::1" 这类裸 IPv6 保持原样
+  if (colon !== -1 && text.indexOf(':') === colon) {
+    text = text.slice(0, colon);
+  }
+  return text;
+}
+
+function trustedHostsFor(host) {
+  const name = normalizeHost(host);
+  if (!name || LOOPBACK_HOSTS.has(name)) return new Set(LOOPBACK_HOSTS);
+  return new Set([name]);
+}
+
+function assertTrustedRequest(req, context) {
+  const allowed = context.allowedHosts;
+  if (!allowed) return;
+  if (!allowed.has(normalizeHost(req.headers.host))) {
+    throw new HttpError(403, 'forbidden host');
+  }
+  const origin = req.headers.origin;
+  if (origin) {
+    let originHost = '';
+    try {
+      originHost = new URL(origin).hostname;
+    } catch {
+      originHost = '';
+    }
+    if (!allowed.has(normalizeHost(originHost))) {
+      throw new HttpError(403, 'forbidden origin');
+    }
+  }
+}
+
 function webInfoPath() {
   return path.join(cacheDir(), 'web.json');
 }
@@ -434,6 +480,7 @@ function serveStatic(req, res, pathname, webDir) {
 }
 
 async function handleRequest(req, res, context) {
+  assertTrustedRequest(req, context);
   const url = new URL(req.url || '/', 'http://localhost');
   if (url.pathname.startsWith('/api/')) {
     return handleApi(req, res, url, context);
@@ -517,7 +564,11 @@ export async function startWebServer({
   const webDir = findWebDir();
   let requestClose = () => {};
   const server = http.createServer((req, res) => {
-    const context = { webDir, onShutdown: () => requestClose() };
+    const context = {
+      webDir,
+      onShutdown: () => requestClose(),
+      allowedHosts: trustedHostsFor(host)
+    };
     handleRequest(req, res, context).catch((error) => {
       if (res.headersSent) {
         res.end();

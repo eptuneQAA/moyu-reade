@@ -26,6 +26,10 @@
 - Web 版打开浏览器需要 `xdg-utils`（桌面系统通常已安装）
 - 终端需要支持 UTF-8；显示彩色主题建议支持 truecolor
 
+> Debian 10 / UOS 20 这类老发行版仓库里的 nodejs 只有 10.x，装 deb 后启动会提示
+> 缺少运行时。用 nvm 装一个 22+ 即可（`moyu` 启动器会自动在 `~/.config/nvm`、
+> `~/.nvm` 下查找），细节见 `debian/README.Debian`。
+
 ## 安装
 
 ### Debian / UOS
@@ -191,8 +195,12 @@ npm ci
 
 GitHub Actions 的打包方式：
 
-- 每次推送 `main`：自动跑测试、构建 deb，并更新 `latest` 预发布包（<https://github.com/eptuneQAA/moyu-reade/releases/tag/latest>）
-- 推送 `v` 开头的 tag：自动构建 deb 并创建对应版本 Release
+| 触发 | 行为 |
+| --- | --- |
+| Pull Request | 跑测试 + `npm run typecheck` + 构建 TUI/Web（不打包 deb） |
+| 推送 `main` | 测试通过后构建 deb，更新 `latest` 预发布包 |
+| 推送 `v*` tag | 校验 tag 与 `debian/changelog` 版本一致，构建 deb 并创建 Release |
+| 手动 | `workflow_dispatch`，可指定要发布的 tag |
 
 ```bash
 git tag v0.2.0
@@ -205,7 +213,9 @@ git push origin v0.2.0
 
 ```bash
 npm install
-npm test
+npm test                 # 51 个用例（解析、分页、配置、Web API）
+npm run typecheck        # tsc --noEmit，web/ 前端是 strict 模式
+npm run bench:layout     # 排版基准（1/5/15MB 书的耗时与内存）
 npm run dev -- ~/Downloads/某本书.txt
 
 # Web 开发：两个终端分别运行
@@ -227,6 +237,28 @@ npm run dev:web
 - `docs/design.md`：整体设计
 - `docs/kindle-style.md`：终端阅读界面和主题设计
 - `docs/web-reader.md`：Web 阅读器设计
+
+## 安全
+
+- Web 服务只监听 `127.0.0.1`，并校验请求的 `Host` / `Origin`：非本机来源
+  （包括 DNS rebinding 把攻击者域名解析到 127.0.0.1 的情况）一律 403。
+- 非 GET 请求必须带 `X-Moyu: 1` 头，普通跨站表单无法触发导入/删除。
+- 删除接口只允许删除书库目录内的文件，且需要二次确认。
+
+## 性能
+
+- 解析后的书按 LRU 缓存（最多 4 本、总字符 24M），不会随阅读数量无限涨内存。
+- TUI 排版结果按宽度缓存（每个 book 2 个宽度），终端 resize 有 120ms 去抖，
+  来回切宽度不再重排。
+- 参考数字（`npm run bench:layout`，终端宽 80 列）：
+
+| 书大小 | 行数 | 首次排版 | 缓存命中 |
+| --- | --- | --- | --- |
+| 1 MB | 26,215 | ~61 ms | ~0.01 ms |
+| 5 MB | 131,072 | ~246 ms | ~0.01 ms |
+| 15 MB | 393,216 | ~810 ms | ~0.02 ms |
+
+首次打开超大字数的书仍会有一次性排版开销，换新宽度时需要重新排版一次。
 
 ## 说明
 

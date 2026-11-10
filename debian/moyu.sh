@@ -31,7 +31,12 @@ if [ -z "$NODE_BIN" ]; then
 fi
 
 if [ -z "$NODE_BIN" ]; then
-  echo "moyu: 需要 Node.js 22 或更高版本（可以用 nvm 安装）。" >&2
+  echo "moyu: 需要 Node.js 22 或更高版本，但没找到可用的 node。" >&2
+  echo "  当前系统 node: $(command -v node >/dev/null 2>&1 && node -v || echo '未安装')" >&2
+  echo "  安装方式（任选其一）：" >&2
+  echo "    1) nvm:  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash" >&2
+  echo "             nvm install 22            # 之后 moyu 会自动在 ~/.config/nvm 下找到它" >&2
+  echo "    2) 发行版仓库里有 nodejs>=22 时，装上即可" >&2
   exit 1
 fi
 

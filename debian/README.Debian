@@ -1,0 +1,25 @@
+moyu 需要 Node.js 22 或更高版本
+
+本包不含 Node 运行时（Architecture: all）。Debian 10 / UOS 20 仓库里的
+nodejs 是 10.x，无法运行 moyu，因此 control 里把 nodejs 写成
+`Recommends: nodejs (>= 22)`：只有满足版本约束时才会自动安装，不会把
+旧版 nodejs 拉进来。
+
+如果启动时报「需要 Node.js 22 或更高版本」，任选一种方式补齐运行时：
+
+  # 1) nvm（推荐，不需要 root，moyu 会自动在 ~/.config/nvm 和 ~/.nvm 下查找）
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+  nvm install 22
+
+  # 2) 发行版仓库里有 nodejs >= 22 时
+  sudo apt install nodejs
+
+也可以用环境变量显式指定解释器：
+
+  NODE_BIN=/path/to/node22/bin/node moyu
+
+其他说明
+--------
+* PDF 阅读需要 pdftotext：`sudo apt install poppler-utils`（control 里是 Suggests）
+* Web 版打开浏览器需要 xdg-utils
+* 配置与进度在 ~/.config/moyu/，书库默认扫描 ~/Documents/Books 和 ~/Downloads

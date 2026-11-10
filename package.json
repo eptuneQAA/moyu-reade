@@ -5,6 +5,19 @@
   "type": "module",
   "license": "MIT",
   "author": "moyu-reader contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eptuneQAA/moyu-reade.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eptuneQAA/moyu-reade/issues"
+  },
+  "homepage": "https://github.com/eptuneQAA/moyu-reade#readme",
+  "files": [
+    "bin/",
+    "dist/",
+    "web/dist/"
+  ],
   "keywords": [
     "novel",
     "reader",

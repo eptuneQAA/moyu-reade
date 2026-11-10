@@ -1,3 +1,20 @@
+moyu (0.2.1) unstable; urgency=medium
+
+  * Security: the local web server now validates the Host and Origin of every
+    request, so a DNS-rebinding page can no longer reach the local API and
+    delete book files. Requests from non-loopback hosts are rejected with 403.
+  * Performance: parsed books are now kept in a bounded LRU cache (max 4 books
+    / 24M characters) instead of growing without limit, and the TUI caches
+    layout per terminal width with a debounced resize handler.
+  * Tooling: CI runs `tsc --noEmit` on the web frontend, packaging no longer
+    skips the build-dependency check, and release builds verify that the tag
+    matches debian/changelog.
+  * Packaging: add debian/README.Debian explaining the Node.js 22 requirement,
+    make the launcher print actionable install hints, and restrict the npm
+    tarball to the shipped files.
+
+ -- moyu-reader contributors <moyu-reader@users.noreply.github.com>  Tue, 10 Nov 2026 09:16:00 +0800
+
 moyu (0.2.0) unstable; urgency=medium
 
   * Add local web reader with bookshelf, covers, typography settings,

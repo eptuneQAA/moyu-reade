@@ -34,10 +34,10 @@
 
 ### Debian / UOS
 
-下载 `moyu_0.2.0_all.deb` 后：
+下载 `moyu_0.2.1_all.deb` 后：
 
 ```bash
-sudo dpkg -i moyu_0.2.0_all.deb
+sudo dpkg -i moyu_0.2.1_all.deb
 moyu --version
 ```
 
@@ -189,7 +189,7 @@ npm ci
 ./scripts/build-deb.sh
 ```
 
-产物：`release/moyu_0.2.0_all.deb` 和 `release/SHA256SUMS`。
+产物：`release/moyu_0.2.1_all.deb` 和 `release/SHA256SUMS`。
 
 打包脚本会运行测试，生成 `dist/moyu.bundle.js` 和 `web/dist`，然后调用 `dpkg-buildpackage`。需要安装 `debhelper`、`dpkg-dev`、`fakeroot`。
 
@@ -203,8 +203,8 @@ GitHub Actions 的打包方式：
 | 手动 | `workflow_dispatch`，可指定要发布的 tag |
 
 ```bash
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.2.1
+git push origin v0.2.1
 ```
 
 也可以手动触发 `release` workflow，填入要发布的 tag。

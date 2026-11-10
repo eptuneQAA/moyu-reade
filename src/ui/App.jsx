@@ -9,7 +9,7 @@ import { scanBooks } from '../core/library.js';
 import {
   chapterAt,
   createBook,
-  layout,
+  layoutCached,
   offsetForLine,
   percentForOffset,
   searchBook
@@ -56,12 +56,21 @@ export default function App({ initialFile = null, noResume = false }) {
   const [highlight, setHighlight] = useState(null);
 
   useEffect(() => {
+    // 拖动窗口时终端会连发 resize，逐次重排大书会卡顿：等尺寸稳定再重排一次
+    let timer = null;
     const onResize = () => {
-      setCols(stdout.columns || 80);
-      setRows(stdout.rows || 24);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        setCols(stdout.columns || 80);
+        setRows(stdout.rows || 24);
+      }, 120);
     };
     stdout.on('resize', onResize);
-    return () => stdout.off('resize', onResize);
+    return () => {
+      if (timer) clearTimeout(timer);
+      stdout.off('resize', onResize);
+    };
   }, [stdout]);
 
   useEffect(() => {
@@ -106,7 +115,7 @@ export default function App({ initialFile = null, noResume = false }) {
   const rowsData = useMemo(
     () =>
       book
-        ? layout(book, textWidth, {
+        ? layoutCached(book, textWidth, {
             indent: book.format !== 'pdf',
             chapterStarts
           })

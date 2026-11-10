@@ -15,6 +15,33 @@ export function layout(book, width, options = {}) {
   return buildRows(book.lines, width, book.lineStarts, options);
 }
 
+// 排版结果按宽度缓存：终端 resize 会连发多个事件，同一宽度重复排版纯属浪费。
+// 每个 book 最多保留 2 个宽度（回退到上一个宽度时直接命中），进程内 WeakMap 不阻止回收。
+const LAYOUT_CACHE_LIMIT = 2;
+const layoutCache = new WeakMap();
+
+export function layoutCached(book, width, options = {}) {
+  let entries = layoutCache.get(book);
+  if (!entries) {
+    entries = new Map();
+    layoutCache.set(book, entries);
+  }
+  const key = `${width}|${options.indent ? 1 : 0}|${options.chapterStarts ? options.chapterStarts.size : 0}`;
+  const cached = entries.get(key);
+  if (cached) return cached;
+  const rows = layout(book, width, options);
+  entries.set(key, rows);
+  while (entries.size > LAYOUT_CACHE_LIMIT) {
+    entries.delete(entries.keys().next().value);
+  }
+  return rows;
+}
+
+export function layoutCacheSize(book) {
+  const entries = layoutCache.get(book);
+  return entries ? entries.size : 0;
+}
+
 export function offsetForLine(book, line) {
   const index = Math.max(0, Math.min(line, book.lines.length - 1));
   return book.lineStarts[index];

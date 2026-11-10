@@ -183,13 +183,42 @@ function chaptersOf(book) {
   });
 }
 
+// 解析后的书按字符数限额缓存：一本 15MB 的中文书约 1600 万字符、150MB 堆内存，
+// 无上限地缓存会把常驻内存吃到 GB 级，所以按 LRU 淘汰。
+const BOOK_CACHE_MAX_BOOKS = 4;
+const BOOK_CACHE_MAX_CHARS = 24 * 1024 * 1024;
+
+function bookCacheChars() {
+  let chars = 0;
+  for (const entry of bookCache.values()) chars += entry.book.textLength || 0;
+  return chars;
+}
+
+function rememberBook(id, mtimeMs, book) {
+  bookCache.delete(id); // 重新插入到末尾，Map 的插入顺序即 LRU 顺序
+  bookCache.set(id, { mtimeMs, book });
+  while (
+    bookCache.size > BOOK_CACHE_MAX_BOOKS ||
+    (bookCacheChars() > BOOK_CACHE_MAX_CHARS && bookCache.size > 1)
+  ) {
+    bookCache.delete(bookCache.keys().next().value);
+  }
+}
+
+export function bookCacheInfo() {
+  return { size: bookCache.size, chars: bookCacheChars() };
+}
+
 function loadBook(entry) {
   const stat = fs.statSync(entry.path);
   const cached = bookCache.get(entry.id);
-  if (cached && cached.mtimeMs === stat.mtimeMs) return cached.book;
+  if (cached && cached.mtimeMs === stat.mtimeMs) {
+    rememberBook(entry.id, cached.mtimeMs, cached.book); // 命中即刷新 LRU 位置
+    return cached.book;
+  }
 
   const book = createBook(parseFile(entry.path));
-  bookCache.set(entry.id, { mtimeMs: stat.mtimeMs, book });
+  rememberBook(entry.id, stat.mtimeMs, book);
   return book;
 }
 

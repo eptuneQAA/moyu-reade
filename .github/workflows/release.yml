@@ -31,9 +31,28 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y debhelper dpkg-dev fakeroot
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Typecheck web frontend
+        run: npm run typecheck
+
+      - name: Check build dependencies
+        run: dpkg-checkbuilddeps
+
+      - name: Check tag matches debian/changelog
+        run: |
+          version="$(dpkg-parsechangelog -S Version)"
+          tag="${{ inputs.tag || github.ref_name }}"
+          if [ "${tag#v}" != "$version" ]; then
+            echo "::error::tag ${tag} 与 debian/changelog 的版本 ${version} 不一致"
+            exit 1
+          fi
+
       - name: Build deb
-        env:
-          MOYU_DPKG_FLAGS: '-d'
         run: ./scripts/build-deb.sh
 
       - name: Create GitHub release
